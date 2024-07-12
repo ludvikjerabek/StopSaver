@@ -24,6 +24,10 @@ Once you select "Start" you will see the icon change as shown below.
 
 ![image](https://github.com/user-attachments/assets/cc75e46f-3e50-4412-accc-987131e3d1e6)
 
+### Safety Features
+
+If the the user session is locked Stop Saver will disable. This is to prevent battery drain as well as preventing sleep when an explicit lock was requested. 
+
 ### Performance
 
 Stop Saver is very low on resouce consumption.
