@@ -24,4 +24,9 @@ Once you select "Start" you will see the icon change as shown below.
 
 ![image](https://github.com/user-attachments/assets/cc75e46f-3e50-4412-accc-987131e3d1e6)
 
+### Performance
+
+Stop Saver is very low on resouce consumption.
+
+![image](https://github.com/user-attachments/assets/13173b5e-dee3-4863-95da-4dcf1c9a439f)
 
