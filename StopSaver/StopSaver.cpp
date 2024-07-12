@@ -8,6 +8,7 @@ HWND hWnd;
 NOTIFYICONDATA nid;
 UINT_PTR timerID;
 bool isStarted = false;
+HANDLE hMutex = NULL;
 
 // Function prototypes
 void SetupTrayIcon();
@@ -20,6 +21,20 @@ void SendMouseMove();
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow) {
+    
+    hMutex = CreateMutex(NULL, FALSE, L"StopSaverTrayAppMutex");
+    if (hMutex == NULL) {
+        MessageBox(NULL, L"Failed to create mutex.", L"Error", MB_ICONEXCLAMATION | MB_OK);
+        return 0;
+    }
+
+    // Check if another instance is running
+    if (GetLastError() == ERROR_ALREADY_EXISTS) {
+        MessageBox(NULL, L"Another instance of the application is already running.", L"Error", MB_ICONEXCLAMATION | MB_OK);
+        return 0;
+    }
+    
+    
     hInst = hInstance;
 
     // Register window class
@@ -52,6 +67,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
+
+    // Release the mutex
+    if (hMutex) {
+        CloseHandle(hMutex);
+    }
+
     return (int)msg.wParam;
 }
 
