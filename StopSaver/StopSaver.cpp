@@ -1,6 +1,10 @@
 #include <windows.h>
 #include <shellapi.h>
+#include <wtsapi32.h>
 #include "resource.h"
+
+// Needed for session change notifications
+#pragma comment(lib, "Wtsapi32.lib")
 
 // Global variables
 HINSTANCE hInst;
@@ -57,6 +61,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         MessageBox(NULL, L"Window Creation Failed!", L"Error", MB_ICONEXCLAMATION | MB_OK);
         return 0;
     }
+
+    // Listen for sesson change notifications
+    WTSRegisterSessionNotification(hWnd, NOTIFY_FOR_THIS_SESSION);
 
     // Setup the tray icon
     SetupTrayIcon();
@@ -151,6 +158,30 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
     case WM_APP + 1:
         if (lParam == WM_LBUTTONDOWN) {
             SetupContextMenu();
+        }
+        break;
+    case WM_WTSSESSION_CHANGE:
+        switch (wParam) {
+        case WTS_SESSION_LOCK:
+            OutputDebugString(L"Session locked\n");
+            // Handle session lock
+            OnStop(); // Example: stop the timer on lock
+            break;
+        case WTS_SESSION_UNLOCK:
+            OutputDebugString(L"Session unlocked\n");
+            // Handle session unlock
+            // OnStart(); // Example: start the timer on unlock
+            break;
+        case WTS_SESSION_LOGON:
+            OutputDebugString(L"Session logon\n");
+            // Handle session logon
+            // OnStart(); // Example: start the timer on logon
+            break;
+        case WTS_SESSION_LOGOFF:
+            OutputDebugString(L"Session logoff\n");
+            // Handle session logoff
+            // OnStop(); // Example: stop the timer on logoff
+            break;
         }
         break;
     case WM_TIMER:
