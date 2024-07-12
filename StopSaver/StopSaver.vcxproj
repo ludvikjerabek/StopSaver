@@ -22,7 +22,7 @@
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{e598f5a1-9df2-4ffe-a396-258e77384e83}</ProjectGuid>
-    <RootNamespace>StopSaverC</RootNamespace>
+    <RootNamespace>StopSaver</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>StopSaver</ProjectName>
   </PropertyGroup>
