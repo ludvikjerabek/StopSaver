@@ -19,27 +19,27 @@ void OnStop();
 void SendMouseMove();
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow) {
     hInst = hInstance;
 
     // Register window class
-    const char* szWindowClass = "StopSaverTrayApp";
+    const wchar_t* szWindowClass = L"StopSaverTrayApp";
     WNDCLASS wc = {};
     wc.lpfnWndProc = WindowProc;
     wc.hInstance = hInstance;
     wc.lpszClassName = szWindowClass;
 
     if (!RegisterClass(&wc)) {
-        MessageBox(NULL, "Window Registration Failed!", "Error", MB_ICONEXCLAMATION | MB_OK);
+        MessageBox(NULL, L"Window Registration Failed!", L"Error", MB_ICONEXCLAMATION | MB_OK);
         return 0;
     }
 
     // Create hidden window
-    hWnd = CreateWindowEx(0, szWindowClass, "Stop Saver Tray App", WS_OVERLAPPEDWINDOW,
+    hWnd = CreateWindowEx(0, szWindowClass, L"Stop Saver Tray App", WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
 
     if (hWnd == NULL) {
-        MessageBox(NULL, "Window Creation Failed!", "Error", MB_ICONEXCLAMATION | MB_OK);
+        MessageBox(NULL, L"Window Creation Failed!", L"Error", MB_ICONEXCLAMATION | MB_OK);
         return 0;
     }
 
@@ -56,45 +56,45 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 }
 
 void SetupTrayIcon() {
-    OutputDebugString("SetupTrayIcon\n");
+    OutputDebugString(L"SetupTrayIcon\n");
     nid.cbSize = sizeof(NOTIFYICONDATA);
     nid.hWnd = hWnd;
     nid.uID = 1;
     nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
-    nid.uCallbackMessage = WM_APP + 1; 
+    nid.uCallbackMessage = WM_APP + 1;
     nid.hIcon = LoadIcon(hInst, MAKEINTRESOURCE(IDI_ICON2));
-    strcpy_s(nid.szTip, "Stop Saver (Inactive)");
+    wcscpy_s(nid.szTip, L"Stop Saver (Inactive)");
     Shell_NotifyIcon(NIM_ADD, &nid);
 }
 
 void UpdateTrayIcon() {
     HICON hIcon = isStarted ? LoadIcon(hInst, MAKEINTRESOURCE(IDI_ICON1)) : LoadIcon(hInst, MAKEINTRESOURCE(IDI_ICON2));
     if (!hIcon) {
-        OutputDebugString("Failed to load icon.\n");
+        OutputDebugString(L"Failed to load icon.\n");
         return;
     }
 
     nid.hIcon = hIcon;
     nid.uFlags = NIF_ICON | NIF_TIP;
-    
-    isStarted ? strcpy_s(nid.szTip, "Stop Saver (Active)") : strcpy_s(nid.szTip, "Stop Saver (Inactive)");
+
+    isStarted ? wcscpy_s(nid.szTip, L"Stop Saver (Active)") : wcscpy_s(nid.szTip, L"Stop Saver (Inactive)");
 
     if (!Shell_NotifyIcon(NIM_MODIFY, &nid)) {
-        OutputDebugString("Failed to update tray icon.\n");
+        OutputDebugString(L"Failed to update tray icon.\n");
     }
 }
 
 void SetupContextMenu() {
-    OutputDebugString("SetupContextMenu\n");
+    OutputDebugString(L"SetupContextMenu\n");
     // Check menu state and toggle accordingly
     UINT startFlag = (timerID != 0) ? MF_CHECKED : MF_UNCHECKED;
     UINT stopFlag = (timerID == 0) ? MF_CHECKED : MF_UNCHECKED;
 
     HMENU hMenu = CreatePopupMenu();
-    AppendMenu(hMenu, MF_STRING | (isStarted ? MF_CHECKED : MF_UNCHECKED), 1, "Start");
-    AppendMenu(hMenu, MF_STRING | (!isStarted ? MF_CHECKED : MF_UNCHECKED), 2, "Stop");
+    AppendMenu(hMenu, MF_STRING | (isStarted ? MF_CHECKED : MF_UNCHECKED), 1, L"Start");
+    AppendMenu(hMenu, MF_STRING | (!isStarted ? MF_CHECKED : MF_UNCHECKED), 2, L"Stop");
     AppendMenu(hMenu, MF_SEPARATOR, 0, NULL);
-    AppendMenu(hMenu, MF_STRING, 4, "Exit");
+    AppendMenu(hMenu, MF_STRING, 4, L"Exit");
 
     POINT pt;
     GetCursorPos(&pt);
@@ -103,7 +103,7 @@ void SetupContextMenu() {
 }
 
 void DestroyTrayIcon() {
-    OutputDebugString("DestroyTrayIcon\n");
+    OutputDebugString(L"DestroyTrayIcon\n");
     Shell_NotifyIcon(NIM_DELETE, &nid);
 }
 
@@ -146,16 +146,16 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 }
 
 void OnTimer() {
-    OutputDebugString("OnTimer\n");
+    OutputDebugString(L"OnTimer\n");
     SendMouseMove();
 }
 
 void OnStart() {
-    OutputDebugString("OnStart\n");
+    OutputDebugString(L"OnStart\n");
     EXECUTION_STATE execState = SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
     if (execState == NULL)
     {
-        OutputDebugString("Failed to set execution state\n");
+        OutputDebugString(L"Failed to set execution state\n");
     }
     timerID = SetTimer(hWnd, 1, 30000, NULL);
     isStarted = true;
@@ -163,19 +163,19 @@ void OnStart() {
 }
 
 void OnStop() {
-    OutputDebugString("OnStop\n");
+    OutputDebugString(L"OnStop\n");
     KillTimer(hWnd, timerID);
     EXECUTION_STATE execState = SetThreadExecutionState(ES_CONTINUOUS);
     if (execState == NULL)
     {
-        OutputDebugString("Failed to set execution state\n");
+        OutputDebugString(L"Failed to set execution state\n");
     }
     isStarted = false;
     UpdateTrayIcon();
 }
 
 void SendMouseMove() {
-    OutputDebugString("OnMove\n");
+    OutputDebugString(L"OnMove\n");
     INPUT input = {};
     input.type = INPUT_MOUSE;
     input.mi.dwFlags = MOUSEEVENTF_MOVE;
