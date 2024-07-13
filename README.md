@@ -8,7 +8,7 @@ Statically compiled Windows VC binary that stops screensaver, sleep, and inactiv
 
 ### Standalone Installation
 
-Download the correct version of the application for your system:
+Download the correct version of the application for your system (or download them from the releases area):
 
 [64 Bit Windows](./Standalone/x64)  
 [32 Bit Windows](./Standalone/Win32)
@@ -17,8 +17,15 @@ Note: Standalone install will not auto launch when you login. This configuration
 
 ### Installation by MSI Installers
 
+Download the correct version of the application for your system (or download them from the releases area):
+
 [64 Bit Windows](./Installers/x64)  
 [32 Bit Windows](./Installers/Win32)
+
+Once installation is completed, you can launch Stop Saver from the application menu. 
+
+![image](https://github.com/user-attachments/assets/cbad578c-3362-4b47-8b44-fbecc9f5b112)
+
 
 ### Usage
 
