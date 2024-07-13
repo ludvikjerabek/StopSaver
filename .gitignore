@@ -398,5 +398,5 @@ FodyWeavers.xsd
 *.sln.iml
 
 # Allow official builds
-!/Builds/Win32
-!/Builds/x64
+!/Standalone/*
+!/Installers/*
