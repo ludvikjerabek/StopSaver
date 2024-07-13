@@ -10,15 +10,15 @@ Statically compiled Windows VC binary that stops screensaver, sleep, and inactiv
 
 Download the correct version of the application for your system:
 
-[64 Bit Windows](StopSaver/blob/master/Standalone/x64/StopSaver.exe)  
-[32 Bit Windows](StopSaver/blob/master/Standalone/Win32/StopSaver.exe)
+[64 Bit Windows](blob/master/Standalone/x64/StopSaver.exe)  
+[32 Bit Windows](blob/master/Standalone/Win32/StopSaver.exe)
 
 Note: Standalone install will not auto launch when you login. This configuration will need to be done manually.
 
 ### Installation by MSI Installers
 
-[64 Bit Windows](StopSaver/blob/master/Installers/x64/StopSaver.msi)  
-[32 Bit Windows](StopSaver/blob/master/Installers/Win32/StopSaver.msi)
+[64 Bit Windows](blob/master/Installers/x64/StopSaver.msi)  
+[32 Bit Windows](blob/master/Installers/Win32/StopSaver.msi)
 
 ### Usage
 
