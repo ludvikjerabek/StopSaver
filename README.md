@@ -6,7 +6,7 @@ Statically compiled Windows VC binary that stops screensaver, sleep, and inactiv
 
 * Windows x86 or x64
 
-### Standalong Installation
+### Standalone Installation
 
 Download the correct version of the application for your system:
 
