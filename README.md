@@ -43,7 +43,7 @@ Once you select "Start" you will see the icon change as shown below.
 
 ### Safety Features
 
-If the the user session is locked Stop Saver will disable. This is to prevent battery drain as well as preventing sleep when an explicit lock was requested. 
+If the the user session is locked Stop Saver will disable. This is to prevent battery drain (eg. closing laptop lid to travel) there will be an option to enable/disable this behavior in the future. 
 
 ### Performance
 
