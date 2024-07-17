@@ -10,7 +10,7 @@
 HINSTANCE hInst;
 HWND hWnd;
 NOTIFYICONDATA nid;
-UINT_PTR timerID;
+UINT_PTR timerID = 0;
 bool isStarted = false;
 HANDLE hMutex = NULL;
 
@@ -23,9 +23,10 @@ void OnStart();
 void OnStop();
 void SendMouseMove();
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
+void Cleanup();
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow) {
-    
+
     hMutex = CreateMutex(NULL, FALSE, L"StopSaverTrayAppMutex");
     if (hMutex == NULL) {
         MessageBox(NULL, L"Failed to create mutex.", L"Error", MB_ICONEXCLAMATION | MB_OK);
@@ -35,10 +36,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     // Check if another instance is running
     if (GetLastError() == ERROR_ALREADY_EXISTS) {
         MessageBox(NULL, L"Another instance of the application is already running.", L"Error", MB_ICONEXCLAMATION | MB_OK);
+        CloseHandle(hMutex); // Close handle before returning
         return 0;
     }
-    
-    
+
     hInst = hInstance;
 
     // Register window class
@@ -50,19 +51,20 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
     if (!RegisterClass(&wc)) {
         MessageBox(NULL, L"Window Registration Failed!", L"Error", MB_ICONEXCLAMATION | MB_OK);
+        CloseHandle(hMutex); // Close handle before returning
         return 0;
     }
 
     // Create hidden window
-    hWnd = CreateWindowEx(0, szWindowClass, L"Stop Saver Tray App", WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
+    hWnd = CreateWindowEx(0, szWindowClass, L"Stop Saver Tray App", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
 
     if (hWnd == NULL) {
         MessageBox(NULL, L"Window Creation Failed!", L"Error", MB_ICONEXCLAMATION | MB_OK);
+        CloseHandle(hMutex); // Close handle before returning
         return 0;
     }
 
-    // Listen for sesson change notifications
+    // Listen for session change notifications
     WTSRegisterSessionNotification(hWnd, NOTIFY_FOR_THIS_SESSION);
 
     // Setup the tray icon
@@ -75,10 +77,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         DispatchMessage(&msg);
     }
 
-    // Release the mutex
-    if (hMutex) {
-        CloseHandle(hMutex);
-    }
+    // Do resource cleanup    
+    Cleanup();
 
     return (int)msg.wParam;
 }
@@ -150,7 +150,6 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
             }
             break;
         case 4: // Exit
-            DestroyTrayIcon();
             PostQuitMessage(0);
             break;
         }
@@ -205,8 +204,7 @@ void OnTimer() {
 void OnStart() {
     OutputDebugString(L"OnStart\n");
     EXECUTION_STATE execState = SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
-    if (execState == NULL)
-    {
+    if (execState == NULL) {
         OutputDebugString(L"Failed to set execution state\n");
     }
     timerID = SetTimer(hWnd, 1, 30000, NULL);
@@ -216,10 +214,12 @@ void OnStart() {
 
 void OnStop() {
     OutputDebugString(L"OnStop\n");
-    KillTimer(hWnd, timerID);
+    if (timerID != 0) {
+        KillTimer(hWnd, timerID);
+        timerID = 0;
+    }
     EXECUTION_STATE execState = SetThreadExecutionState(ES_CONTINUOUS);
-    if (execState == NULL)
-    {
+    if (execState == NULL) {
         OutputDebugString(L"Failed to set execution state\n");
     }
     isStarted = false;
@@ -232,4 +232,16 @@ void SendMouseMove() {
     input.type = INPUT_MOUSE;
     input.mi.dwFlags = MOUSEEVENTF_MOVE;
     SendInput(1, &input, sizeof(INPUT));
+}
+
+void Cleanup() {
+    if (timerID != 0) {
+        KillTimer(hWnd, timerID);
+    }
+    WTSUnRegisterSessionNotification(hWnd);
+    DestroyTrayIcon();
+    if (hMutex) {
+        CloseHandle(hMutex);
+        hMutex = NULL;
+    }
 }
