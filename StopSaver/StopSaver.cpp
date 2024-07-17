@@ -15,6 +15,10 @@ bool isStarted = false;
 HANDLE hMutex = NULL;
 
 // Function prototypes
+void CheckForExistingInstance();
+void Initialize(HINSTANCE hInstance);
+void CreateMainWindow(HINSTANCE hInstance);
+void Cleanup();
 void SetupTrayIcon();
 void SetupContextMenu();
 void DestroyTrayIcon();
@@ -23,25 +27,52 @@ void OnStart();
 void OnStop();
 void SendMouseMove();
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
-void Cleanup();
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow) {
+    CheckForExistingInstance();
+    
+    Initialize(hInstance);
 
+    // Message loop
+    MSG msg;
+    while (GetMessage(&msg, NULL, 0, 0) > 0) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
+    // Do resource cleanup
+    Cleanup();
+
+    return (int)msg.wParam;
+}
+
+void CheckForExistingInstance() {
     hMutex = CreateMutex(NULL, FALSE, L"StopSaverTrayAppMutex");
     if (hMutex == NULL) {
         MessageBox(NULL, L"Failed to create mutex.", L"Error", MB_ICONEXCLAMATION | MB_OK);
-        return 0;
+        exit(0);
     }
 
     // Check if another instance is running
     if (GetLastError() == ERROR_ALREADY_EXISTS) {
         MessageBox(NULL, L"Another instance of the application is already running.", L"Error", MB_ICONEXCLAMATION | MB_OK);
         CloseHandle(hMutex); // Close handle before returning
-        return 0;
+        exit(0);
     }
+}
 
+void Initialize(HINSTANCE hInstance) {
     hInst = hInstance;
+    CreateMainWindow(hInstance);
 
+    // Listen for session change notifications
+    WTSRegisterSessionNotification(hWnd, NOTIFY_FOR_THIS_SESSION);
+
+    // Setup the tray icon
+    SetupTrayIcon();
+}
+
+void CreateMainWindow(HINSTANCE hInstance) {
     // Register window class
     const wchar_t* szWindowClass = L"StopSaverTrayApp";
     WNDCLASS wc = {};
@@ -52,7 +83,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     if (!RegisterClass(&wc)) {
         MessageBox(NULL, L"Window Registration Failed!", L"Error", MB_ICONEXCLAMATION | MB_OK);
         CloseHandle(hMutex); // Close handle before returning
-        return 0;
+        exit(0);
     }
 
     // Create hidden window
@@ -61,26 +92,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     if (hWnd == NULL) {
         MessageBox(NULL, L"Window Creation Failed!", L"Error", MB_ICONEXCLAMATION | MB_OK);
         CloseHandle(hMutex); // Close handle before returning
-        return 0;
+        exit(0);
     }
-
-    // Listen for session change notifications
-    WTSRegisterSessionNotification(hWnd, NOTIFY_FOR_THIS_SESSION);
-
-    // Setup the tray icon
-    SetupTrayIcon();
-
-    // Message loop
-    MSG msg;
-    while (GetMessage(&msg, NULL, 0, 0) > 0) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
-
-    // Do resource cleanup    
-    Cleanup();
-
-    return (int)msg.wParam;
 }
 
 void SetupTrayIcon() {
