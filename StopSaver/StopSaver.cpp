@@ -227,7 +227,7 @@ void OnStop() {
 }
 
 void SendMouseMove() {
-    OutputDebugString(L"OnMove\n");
+    OutputDebugString(L"SendMouseMove\n");
     INPUT input = {};
     input.type = INPUT_MOUSE;
     input.mi.dwFlags = MOUSEEVENTF_MOVE;
@@ -235,6 +235,7 @@ void SendMouseMove() {
 }
 
 void Cleanup() {
+    OutputDebugString(L"Cleanup\n");
     if (timerID != 0) {
         KillTimer(hWnd, timerID);
     }
