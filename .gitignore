@@ -389,17 +389,10 @@ FodyWeavers.xsd
 
 # Windows Installer files from build outputs
 *.cab
-#*.msi
+*.msi
 *.msix
 *.msm
 *.msp
 
 # JetBrains Rider
 *.sln.iml
-
-
-# Allow official builds
-!/Standalone/Win32
-!/Standalone/x64
-!/Installers/Win32
-!/Installers/x64
