@@ -1,48 +1,49 @@
 # Stop Saver
 
-Statically compiled Windows VC binary that stops screensaver, sleep, and inactivity.  
+Stop Saver is a statically compiled Windows VC binary designed to prevent screensaver activation, sleep, and inactivity.
 
-### Requirements:
+## Why I Created This Tool
+
+I created Stop Saver to address the common frustration of system lockout and sleep while working from home. Many systems will also drop VPN connections during periods of inactivity, negatively impacting important tasks such as long-running SSH sessions, monitoring, or downloads. By using Stop Saver, you can ensure that your computer remains active and responsive without manual intervention.
+
+## Requirements
 
 * Windows x86 or x64
 
-### Standalone Installation
+## Standalone Installation
 
-Download the correct standalone version of the application for your system from the [releases area](https://github.com/ludvikjerabek/StopSaver/releases)
+Download the appropriate standalone version of the application for your system from the [releases area](https://github.com/ludvikjerabek/StopSaver/releases).
 
+**Note:** The standalone installation will not auto-launch upon login. You will need to configure this manually.
 
-Note: Standalone install will not auto launch when you login. This configuration will need to be done manually.
+## Installation via MSI Installers
 
-### Installation by MSI Installers
+Download the appropriate version of the MSI package for your system from the [releases area](https://github.com/ludvikjerabek/StopSaver/releases).
 
-Download the correct version of the MSI package for your system from the [releases area](https://github.com/ludvikjerabek/StopSaver/releases)
+Once the installation is complete, you can launch Stop Saver from the application menu.
 
-Once installation is completed, you can launch Stop Saver from the application menu. 
+![Application Menu](https://github.com/user-attachments/assets/cbad578c-3362-4b47-8b44-fbecc9f5b112)
 
-![image](https://github.com/user-attachments/assets/cbad578c-3362-4b47-8b44-fbecc9f5b112)
+## Usage
 
+After launching Stop Saver, you will see a task tray icon as shown below.
 
-### Usage
+![Task Tray Icon](https://github.com/user-attachments/assets/3cb5e3b9-0ddb-4cd6-8710-63eea2c86eef)
 
-Once Stop Saver is launched you will have a task tray icon as shown below.
+Click the icon and select the desired state.
 
-![image](https://github.com/user-attachments/assets/3cb5e3b9-0ddb-4cd6-8710-63eea2c86eef)
+![Select State](https://github.com/user-attachments/assets/254c01fb-a4ca-4505-a72c-2f67447fef70)
 
-Click the icon and select the desired state. 
+Once you select "Start," the icon will change as shown below.
 
-![image](https://github.com/user-attachments/assets/254c01fb-a4ca-4505-a72c-2f67447fef70)
+![Start Icon](https://github.com/user-attachments/assets/cc75e46f-3e50-4412-accc-987131e3d1e6)
 
-Once you select "Start" you will see the icon change as shown below.
+## Safety Features
 
-![image](https://github.com/user-attachments/assets/cc75e46f-3e50-4412-accc-987131e3d1e6)
+If the user session is locked, Stop Saver will disable to prevent battery drain (e.g., closing the laptop lid to travel). There will be an option to enable/disable this behavior in future updates.
 
-### Safety Features
+## Performance
 
-If the the user session is locked Stop Saver will disable. This is to prevent battery drain (eg. closing laptop lid to travel) there will be an option to enable/disable this behavior in the future. 
+Stop Saver is very low on resource consumption.
 
-### Performance
-
-Stop Saver is very low on resouce consumption.
-
-![image](https://github.com/user-attachments/assets/13173b5e-dee3-4863-95da-4dcf1c9a439f)
-
+![Performance](https://github.com/user-attachments/assets/13173b5e-dee3-4863-95da-4dcf1c9a439f)
