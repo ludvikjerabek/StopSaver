@@ -204,6 +204,7 @@ void SetupContextMenu() {
     GetCursorPos(&pt);
     SetForegroundWindow(hWnd);
     TrackPopupMenu(hMenu, TPM_BOTTOMALIGN | TPM_LEFTALIGN, pt.x, pt.y, 0, hWnd, NULL);
+    DestroyMenu(hMenu);
 }
 
 void DestroyTrayIcon() {
