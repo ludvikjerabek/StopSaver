@@ -4,7 +4,14 @@ Stop Saver is a statically compiled Windows VC binary designed to prevent screen
 
 ## Why I Created This Tool
 
-I created Stop Saver to address the common frustration of system lockout and sleep while working from home. Many systems will also drop VPN connections during periods of inactivity, negatively impacting important tasks such as long-running SSH sessions, monitoring, or downloads. By using Stop Saver, you can ensure that your computer remains active and responsive without manual intervention.
+I built Stop Saver to solve a common frustration: system lockouts and sleep interruptions while working from home. Many systems automatically disconnect VPN sessions after periods of inactivity, which can disrupt critical tasks like long-running SSH sessions, monitoring, or downloads.
+
+With Stop Saver, your computer stays active and responsive—no manual intervention needed.
+
+### Why I Chose to Build It Myself
+* I didn’t trust other online solutions.
+* I wanted a simple, lightweight approach.
+* I needed a native Win32 C/C++ single-binary solution.
 
 ## Requirements
 
