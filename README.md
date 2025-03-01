@@ -1,4 +1,5 @@
 # Stop Saver
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/ludvikjerabek/stopsaver/total)
 
 Stop Saver is a statically compiled Windows VC binary designed to prevent screensaver activation, sleep, and inactivity.
 
