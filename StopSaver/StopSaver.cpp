@@ -20,9 +20,9 @@ HANDLE hMutex = NULL;
 std::shared_ptr<spdlog::logger> logger;
 
 // Function prototypes
-void CheckForExistingInstance();
-void Initialize(HINSTANCE hInstance);
-void CreateMainWindow(HINSTANCE hInstance);
+bool CheckForExistingInstance();
+bool Initialize(HINSTANCE hInstance);
+bool CreateMainWindow(HINSTANCE hInstance);
 void SetupTrayIcon();
 void UpdateTrayIcon();
 void SetupContextMenu();
@@ -55,26 +55,25 @@ spdlog::level::level_enum GetLogLevelFromEnv() {
         return default_log_level;
     }
 
-    std::wstring logLevelWStr(logLevelStr);
-    std::string logLevel(logLevelWStr.begin(), logLevelWStr.end());
+    std::wstring logLevel(logLevelStr);
 
     free(logLevelStr);
 
-    if (logLevel == "trace") return spdlog::level::trace;
-    if (logLevel == "debug") return spdlog::level::debug;
-    if (logLevel == "info") return spdlog::level::info;
-    if (logLevel == "warn") return spdlog::level::warn;
-    if (logLevel == "error") return spdlog::level::err;
-    if (logLevel == "critical") return spdlog::level::critical;
-    if (logLevel == "off") return spdlog::level::off;
+    if (logLevel == L"trace") return spdlog::level::trace;
+    if (logLevel == L"debug") return spdlog::level::debug;
+    if (logLevel == L"info") return spdlog::level::info;
+    if (logLevel == L"warn") return spdlog::level::warn;
+    if (logLevel == L"error") return spdlog::level::err;
+    if (logLevel == L"critical") return spdlog::level::critical;
+    if (logLevel == L"off") return spdlog::level::off;
 
     return default_log_level;
 }
 
 
-int WINAPI wWinMain (_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd){
+int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd) {
     std::wstring logPath = ExpandPath(L"%USERPROFILE%\\stopsaver.log");
-
+    
     if (logPath.empty()) {
         MessageBox(NULL, L"Failed to expand log path.", L"Error", MB_ICONEXCLAMATION | MB_OK);
         return 1;
@@ -91,8 +90,17 @@ int WINAPI wWinMain (_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
         return 1;
     }
 
-    CheckForExistingInstance();
-    Initialize(hInstance);
+    if (!CheckForExistingInstance()) {
+        Cleanup();  // Early cleanup on failure
+        logger->info(L"Application exited");
+        return 1;
+    }
+
+    if (!Initialize(hInstance)) {
+        Cleanup();
+        logger->info(L"Application exited");
+        return 1;
+    }
 
     MSG msg;
     while (GetMessage(&msg, NULL, 0, 0) > 0) {
@@ -100,59 +108,62 @@ int WINAPI wWinMain (_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
         DispatchMessage(&msg);
     }
 
+    Cleanup();
     logger->info(L"Application exited");
     return (int)msg.wParam;
 }
 
-void CheckForExistingInstance() {
+bool CheckForExistingInstance() {
     logger->trace(L"CheckForExistingInstance()");
     hMutex = CreateMutex(NULL, FALSE, L"StopSaverTrayAppMutex");
+    
     if (hMutex == NULL) {
         logger->error(L"Failed to create mutex");
-        exit(0);
+        return false;
     }
 
     if (GetLastError() == ERROR_ALREADY_EXISTS) {
         logger->error(L"Another instance of the application is already running");
         CloseHandle(hMutex);
-        exit(0);
+        return false;
     }
+    
+    return true;
 }
 
-void Initialize(HINSTANCE hInstance) {
+bool Initialize(HINSTANCE hInstance) {
     logger->trace(L"Initialize()");
     hInst = hInstance;
-    CreateMainWindow(hInstance);
-
+    if (!CreateMainWindow(hInstance)) {
+        return false;
+    }
     if (!WTSRegisterSessionNotification(hWnd, NOTIFY_FOR_THIS_SESSION)) {
         logger->error(L"Failed to register session notifications");
-        exit(0);
+        return false;
     }
-
     SetupTrayIcon();
+    return true;
 }
 
-void CreateMainWindow(HINSTANCE hInstance) {
+bool CreateMainWindow(HINSTANCE hInstance) {
     logger->trace(L"CreateMainWindow()");
     const wchar_t* szWindowClass = L"StopSaverTrayApp";
     WNDCLASS wc = {};
     wc.lpfnWndProc = WindowProc;
     wc.hInstance = hInstance;
     wc.lpszClassName = szWindowClass;
-
     if (!RegisterClass(&wc)) {
         logger->error(L"Window Registration Failed!");
-        CloseHandle(hMutex);
-        exit(0);
+        return false;
     }
-
     hWnd = CreateWindowEx(0, szWindowClass, L"Stop Saver Tray App", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
-
     if (hWnd == NULL) {
         logger->error(L"Window Creation Failed!");
-        CloseHandle(hMutex);
-        exit(0);
+        // Unregister the class since we registered it
+        UnregisterClass(szWindowClass, hInstance);
+        return false;
     }
+    return true;
 }
 
 void SetupTrayIcon() {
@@ -214,9 +225,6 @@ void DestroyTrayIcon() {
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
     switch (message) {
-    case WM_DESTROY:
-        Cleanup();
-        break;
     case WM_COMMAND:
         switch (LOWORD(wParam)) {
         case 1: // Start
