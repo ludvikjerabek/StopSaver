@@ -156,7 +156,7 @@ bool CreateMainWindow(HINSTANCE hInstance) {
         logger->error(L"Window Registration Failed!");
         return false;
     }
-    hWnd = CreateWindowEx(0, szWindowClass, L"Stop Saver Tray App", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
+    hWnd = CreateWindowEx(0, szWindowClass, L"Stop Saver Tray App", 0, 0, 0, 0, 0, HWND_MESSAGE, NULL, hInstance, NULL);
     if (hWnd == NULL) {
         logger->error(L"Window Creation Failed!");
         // Unregister the class since we registered it
