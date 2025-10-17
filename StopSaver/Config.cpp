@@ -56,6 +56,15 @@ void Config::setMaxSizeLogSize(std::uint32_t logFileSize) {
     _config_key.SetDwordValue(L"MaxSizeLogSize", logFileSize);
 }
 
+std::uint32_t Config::getMouseIntervalMs(std::uint32_t def) const noexcept {
+    try { return _config_key.GetDwordValue(L"MouseIntervalMs"); }
+    catch (...) { return def; }
+}
+
+void Config::setMouseIntervalMs(std::uint32_t interval){
+    _config_key.SetDwordValue(L"MouseIntervalMs", interval);
+}
+
 bool Config::getAutoStartOnLaunch(bool def) const noexcept {
     try { return _config_key.GetDwordValue(L"AutoStartOnLaunch") != 0; }
     catch (...) { return def; }

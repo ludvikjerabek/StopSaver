@@ -3,6 +3,22 @@
 bool StopSaverApp::init(HINSTANCE hInst) {
     _logger->trace(L"StopSaverApp::init()");
     _hInst = hInst;
+    
+    constexpr uint32_t MIN_INTERVAL_MS = 1000;
+    constexpr uint32_t MAX_INTERVAL_MS = 60000;
+
+    _timer_interval = _config->getMouseIntervalMs();
+
+    if (_timer_interval < MIN_INTERVAL_MS) {
+        _logger->warn(L"Mouse interval < 1000 ms — clamping to 1000 ms (1s)");
+        _config->setMouseIntervalMs(MIN_INTERVAL_MS);
+        _timer_interval = MIN_INTERVAL_MS;
+    }
+    else if (_timer_interval > MAX_INTERVAL_MS) {
+        _logger->warn(L"Mouse interval > 60000 ms — clamping to 60000 ms (60s)");
+        _config->setMouseIntervalMs(MAX_INTERVAL_MS);
+        _timer_interval = MAX_INTERVAL_MS;
+    }
 
     // Register window class with static thunk
     static const wchar_t* kClass = L"StopSaverTrayApp";
@@ -100,7 +116,7 @@ void StopSaverApp::onStart() {
     EXECUTION_STATE es = SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
     if (es == NULL) _logger->error(L"Failed to set execution state");
 
-    if (!_timer.start(_hWnd, 1, 30000)) {
+    if (!_timer.start(_hWnd, 1, _timer_interval)) {
         _logger->error(L"Failed to create timer");
         return;
     }

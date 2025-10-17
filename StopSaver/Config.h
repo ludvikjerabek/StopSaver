@@ -15,6 +15,9 @@ public:
 
     std::uint32_t getMaxSizeLogSize(std::uint32_t def = 10u * 1024u * 1024u) const noexcept;
     void setMaxSizeLogSize(std::uint32_t logFileSize);
+
+    std::uint32_t getMouseIntervalMs(std::uint32_t def = 30000) const noexcept;
+    void setMouseIntervalMs(std::uint32_t interval);
     
     bool getAutoStartOnLaunch(bool def = false) const noexcept;
     void setAutoStartOnLaunch(bool bAutoStart);

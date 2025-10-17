@@ -12,7 +12,8 @@
 class StopSaverApp 
 {
 public:
-    explicit StopSaverApp(std::shared_ptr<Config> config, std::shared_ptr<spdlog::logger> log) : _config(std::move(config)), _logger(std::move(log)) {}
+    explicit StopSaverApp(std::shared_ptr<Config> config, std::shared_ptr<spdlog::logger> log) : _timer_interval(30000) , _config(std::move(config)), _logger(std::move(log)) {}
+
     ~StopSaverApp() = default;
 
     bool init(HINSTANCE hInst);
@@ -63,6 +64,7 @@ private:
     TrayIcon       _tray;
     Timer          _timer;
     SessionNotify  _session;
+    UINT _timer_interval;
 
     std::unique_ptr<WindowClassRegistrar> _wcReg;
     std::shared_ptr<spdlog::logger> _logger;
