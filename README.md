@@ -48,7 +48,25 @@ Once you select "Start," the icon will change as shown below.
 
 ## Safety Features
 
-If the user session is locked, Stop Saver will disable to prevent battery drain (e.g., closing the laptop lid to travel). There will be an option to enable/disable this behavior in future updates.
+If the user session is locked, Stop Saver will disable to prevent battery drain (e.g., closing the laptop lid to travel).
+
+## Tray Configuration Options
+
+<img width="254" height="133" alt="image" src="https://github.com/user-attachments/assets/6209b9c0-80aa-436d-9c6d-56d9c4e57a83" />
+  
+* Start automatically on launch - Once the applicaiton lanches, it will automatically be in the started state.
+* Restore active state on unlock - If you lock your system, walk away, and unlock. The prior running state will resume.
+
+## User Registry Options (Manual Overrides)
+
+Under the `HKEY_CURRENT_USER\Software\StopSaver` registry
+
+* LogFile - REG_EXPAND_SZ value can be used to change the logfile path. Default is `%USERPOFILE%/stopsaver.log`
+* LogLevel - REG_SZ string values trace, debug, info, warn, error, critical, off. Default is `error`
+* MaxSizeLogSize - REG_DWORD value max size of logfile in bytes. Default is `10485760` 10MB
+* MouseIntervalMs - REG_DWORD value from 1000 to 60000 (in miliseconds). Default is `30000` (30s).
+* AutoStartOnLaunch - REG_DWORD value 0 or 1 are associated with the Tray Configuration Option `Start automatically on launch`
+* RestoreOnUnlock - REG_DWORD value 0 or 1 are associated with theTray Configuration Option `Restore active state on unlock`
 
 ## Performance
 
