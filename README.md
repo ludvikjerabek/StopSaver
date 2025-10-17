@@ -40,7 +40,7 @@ After launching Stop Saver, you will see a task tray icon as shown below.
 
 Click the icon and select the desired state.
 
-![Select State](https://github.com/user-attachments/assets/254c01fb-a4ca-4505-a72c-2f67447fef70)
+<img width="264" height="192" alt="image" src="https://github.com/user-attachments/assets/7276c0c8-41a4-4091-926d-c1a579b69de9" />
 
 Once you select "Start," the icon will change as shown below.
 
