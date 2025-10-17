@@ -7,7 +7,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     SingleInstanceGuard instance(L"StopSaverTrayAppMutex");
     std::shared_ptr<spdlog::logger> logger;
     std::shared_ptr<Config> config = std::make_shared<Config>();
-
     std::wstring logPath = config->getLogFile();
 
     if (logPath.empty()) {
@@ -17,6 +16,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
     try {
         logger = spdlog::rotating_logger_mt("stopsaver", logPath, config->getMaxSizeLogSize(), 1);
+        spdlog::flush_every(std::chrono::seconds(1));
         logger->set_level(config->getLogLevel());
         logger->set_pattern("%Y-%m-%dT%H:%M:%S.%f%z %l %P: %v");
         logger->info(L"Application started");
