@@ -2,7 +2,6 @@
 #include <windows.h>
 #include "spdlog/spdlog.h"
 
-// Local to this TU: not visible from the header
 static std::wstring ExpandEnvStrings(const std::wstring& input) {
     DWORD requiredSize = ::ExpandEnvironmentStringsW(input.c_str(), nullptr, 0);
     if (requiredSize == 0) {
