@@ -24,8 +24,6 @@ bool StopSaverApp::init(HINSTANCE hInst) {
     _restoreOnUnlock = _config->getRestoreOnUnlock();
     _showUserAsActive = _config->getShowUserAsActive();
 
-    // Register window class with static thunk
-    static const wchar_t* kClass = L"StopSaverTrayApp";
     _wcReg = std::make_unique<WindowClassRegistrar>(_hInst, kClass, &StopSaverApp::s_wndProc);
     if (!_wcReg->ok()) {
         _logger->error(L"Window Registration Failed");
@@ -44,7 +42,7 @@ bool StopSaverApp::init(HINSTANCE hInst) {
         return false;
     }
 
-    if (_config->getAutoStartOnLaunch()) {
+    if (_autoStartOnLaunch) {
         onStart();
     }
 
@@ -57,15 +55,12 @@ int StopSaverApp::run() {
         TranslateMessage(&msg);
         DispatchMessageW(&msg);
     }
-    // Timer and tray and session unregister via destructors
     return static_cast<int>(msg.wParam);
 }
 
 bool StopSaverApp::createMainWindow() {
     _logger->trace(L"StopSaverApp::createMainWindow()");
-    static const wchar_t* kClass = L"StopSaverTrayApp";
 
-    // Pass `this` through lpParam. Bind in WM_NCCREATE.
     _hWnd = CreateWindowExW(
         0, kClass, L"Stop Saver Tray App",
         WS_OVERLAPPEDWINDOW,
@@ -122,7 +117,7 @@ void StopSaverApp::onStart() {
     EXECUTION_STATE es = SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
     if (es == NULL) _logger->error(L"Failed to set execution state");
 
-    if (!_timer.start(_hWnd, 1, _timer_interval)) {
+    if (!_timer.start(_hWnd, IDT_MAIN_TIMER, _timer_interval)) {
         _logger->error(L"Failed to create timer");
         return;
     }
@@ -228,7 +223,7 @@ LRESULT StopSaverApp::wndProc(UINT message, WPARAM wParam, LPARAM lParam) {
             break;
         case WTS_SESSION_UNLOCK: 
             _logger->debug(L"Session unlocked");
-            if (_config->getRestoreOnUnlock() && _stateOnLock)
+            if (_restoreOnUnlock && _stateOnLock)
             {
                 _logger->debug(L"Restoring state, to running");
                 onStart();
@@ -245,7 +240,7 @@ LRESULT StopSaverApp::wndProc(UINT message, WPARAM wParam, LPARAM lParam) {
         break;
 
     case WM_TIMER:
-        if (wParam == 1) onTimer();
+        if (wParam == IDT_MAIN_TIMER) onTimer();
         break;
 
     default:

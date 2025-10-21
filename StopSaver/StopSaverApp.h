@@ -57,6 +57,7 @@ private:
     LRESULT wndProc(UINT msg, WPARAM wParam, LPARAM lParam);
 
 private:
+    static constexpr wchar_t kClass[] = L"StopSaverTrayApp";
     HINSTANCE _hInst{ nullptr };
     HWND      _hWnd{ nullptr };
     bool      _isStarted{ false };
