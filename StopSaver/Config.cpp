@@ -83,6 +83,15 @@ void Config::setRestoreOnUnlock(bool bRestore) {
     _config_key.SetDwordValue(L"RestoreOnUnlock", bRestore ? 1u : 0u);
 }
 
+bool Config::getShowUserAsActive(bool def) const noexcept {
+    try { return _config_key.GetDwordValue(L"ShowUserAsActive") != 0; }
+    catch (...) { return def; }
+}
+
+void Config::setShowUserAsActive(bool bShowActive) {
+    _config_key.SetDwordValue(L"ShowUserAsActive", bShowActive ? 1u : 0u);
+}
+
 bool Config::valueExists(const wchar_t* name) const noexcept {
     try { (void)_config_key.QueryValueType(name); return true; }
     catch (...) { return false; }

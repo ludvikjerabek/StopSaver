@@ -20,6 +20,10 @@ bool StopSaverApp::init(HINSTANCE hInst) {
         _timer_interval = MAX_INTERVAL_MS;
     }
 
+    _autoStartOnLaunch = _config->getAutoStartOnLaunch();
+    _restoreOnUnlock = _config->getRestoreOnUnlock();
+    _showUserAsActive = _config->getShowUserAsActive();
+
     // Register window class with static thunk
     static const wchar_t* kClass = L"StopSaverTrayApp";
     _wcReg = std::make_unique<WindowClassRegistrar>(_hInst, kClass, &StopSaverApp::s_wndProc);
@@ -97,8 +101,9 @@ void StopSaverApp::setupContextMenu() {
     
     CheckMenuItem(menu, IDM_START, MF_BYCOMMAND | (_isStarted ? MF_CHECKED : MF_UNCHECKED));
     CheckMenuItem(menu, IDM_STOP, MF_BYCOMMAND | (!_isStarted ? MF_CHECKED : MF_UNCHECKED));
-    CheckMenuItem(menu, IDM_AUTO_START, MF_BYCOMMAND | (_config->getAutoStartOnLaunch() ? MF_CHECKED : MF_UNCHECKED));
-    CheckMenuItem(menu, IDM_RESTORE_ON_UNLOCK, MF_BYCOMMAND | (_config->getRestoreOnUnlock() ? MF_CHECKED : MF_UNCHECKED));
+    CheckMenuItem(menu, IDM_AUTO_START, MF_BYCOMMAND | (_autoStartOnLaunch ? MF_CHECKED : MF_UNCHECKED));
+    CheckMenuItem(menu, IDM_RESTORE_ON_UNLOCK, MF_BYCOMMAND | (_restoreOnUnlock ? MF_CHECKED : MF_UNCHECKED));
+    CheckMenuItem(menu, IDM_KEEP_ACTIVE, MF_BYCOMMAND | (_showUserAsActive ? MF_CHECKED : MF_UNCHECKED));
 
     POINT pt; GetCursorPos(&pt);
     SetForegroundWindow(_hWnd);
@@ -108,7 +113,8 @@ void StopSaverApp::setupContextMenu() {
 
 void StopSaverApp::onTimer() {
     _logger->trace(L"StopSaverApp::onTimer()");
-    sendMouseMove();
+    if( _showUserAsActive )
+        sendMouseMove();
 }
 
 void StopSaverApp::onStart() {
@@ -143,12 +149,20 @@ void StopSaverApp::onExit() {
 
 void StopSaverApp::onAutoStart() {
     _logger->trace(L"StopSaverApp::onAutoStart()");
-    _config->setAutoStartOnLaunch(!_config->getAutoStartOnLaunch());
+    _autoStartOnLaunch = !_autoStartOnLaunch;
+    _config->setAutoStartOnLaunch(_autoStartOnLaunch);
 }
 
 void StopSaverApp::onRestoreOnUnlock() {
     _logger->trace(L"StopSaverApp::onRestoreOnUnlock()");
-    _config->setRestoreOnUnlock(!_config->getRestoreOnUnlock());
+    _restoreOnUnlock = !_restoreOnUnlock;
+    _config->setRestoreOnUnlock(_restoreOnUnlock);
+}
+
+void StopSaverApp::onShowUserAsActive() {
+    _logger->trace(L"StopSaverApp::onShowUserAsActive()");
+    _showUserAsActive = !_showUserAsActive;
+    _config->setShowUserAsActive(_showUserAsActive);
 }
 
 void StopSaverApp::sendMouseMove() {
@@ -190,6 +204,9 @@ LRESULT StopSaverApp::wndProc(UINT message, WPARAM wParam, LPARAM lParam) {
             break;
         case IDM_RESTORE_ON_UNLOCK:
             onRestoreOnUnlock();
+            break;
+        case IDM_KEEP_ACTIVE:
+            onShowUserAsActive();
             break;
         case IDM_EXIT:  onExit(); break;
         }
