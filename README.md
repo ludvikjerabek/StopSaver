@@ -69,6 +69,7 @@ Under the `HKEY_CURRENT_USER\Software\StopSaver` registry
 * MouseIntervalMs - REG_DWORD value from 1000 to 60000 (in miliseconds). Default is `30000` (30s).
 * AutoStartOnLaunch - REG_DWORD value 0 or 1 are associated with the Tray Configuration Option `Start automatically on launch`
 * RestoreOnUnlock - REG_DWORD value 0 or 1 are associated with theTray Configuration Option `Restore active state on unlock`
+* ShowUserAsActive - REG_DWORD value 0 or 1 are associated with theTray Configuration Option `Show user as active`
 
 ## How it works
 
