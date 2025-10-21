@@ -40,7 +40,7 @@ After launching Stop Saver, you will see a task tray icon as shown below.
 
 Click the icon and select the desired state.
 
-<img width="264" height="192" alt="image" src="https://github.com/user-attachments/assets/7276c0c8-41a4-4091-926d-c1a579b69de9" />
+<img width="268" height="211" alt="image" src="https://github.com/user-attachments/assets/fcdda1a3-d756-4b3c-9b6a-0e1c4152be80" />
 
 Once you select "Start," the icon will change as shown below.
 
@@ -52,10 +52,12 @@ If the user session is locked, Stop Saver will disable to prevent battery drain 
 
 ## Tray Configuration Options
 
-<img width="254" height="133" alt="image" src="https://github.com/user-attachments/assets/6209b9c0-80aa-436d-9c6d-56d9c4e57a83" />
+<img width="254" height="157" alt="image" src="https://github.com/user-attachments/assets/cd296418-e8ff-4372-8133-65fb3f2be8c2" />
   
 * Start automatically on launch - Once the applicaiton lanches, it will automatically be in the started state.
 * Restore active state on unlock - If you lock your system, walk away, and unlock. The prior running state will resume.
+* Show user as active - Send input type `INPUT_MOUSE` and event type `MOUSEEVENTF_MOVE` which telling the system the mouse moved.
+  * Note: This is what keeps other apps showing as active.
 
 ## User Registry Options (Manual Overrides)
 

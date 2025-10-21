@@ -2,7 +2,6 @@
 #include <windows.h>
 #include "spdlog/spdlog.h"
 
-// Local to this TU: not visible from the header
 static std::wstring ExpandEnvStrings(const std::wstring& input) {
     DWORD requiredSize = ::ExpandEnvironmentStringsW(input.c_str(), nullptr, 0);
     if (requiredSize == 0) {
@@ -81,6 +80,15 @@ bool Config::getRestoreOnUnlock(bool def) const noexcept {
 
 void Config::setRestoreOnUnlock(bool bRestore) {
     _config_key.SetDwordValue(L"RestoreOnUnlock", bRestore ? 1u : 0u);
+}
+
+bool Config::getShowUserAsActive(bool def) const noexcept {
+    try { return _config_key.GetDwordValue(L"ShowUserAsActive") != 0; }
+    catch (...) { return def; }
+}
+
+void Config::setShowUserAsActive(bool bShowActive) {
+    _config_key.SetDwordValue(L"ShowUserAsActive", bShowActive ? 1u : 0u);
 }
 
 bool Config::valueExists(const wchar_t* name) const noexcept {

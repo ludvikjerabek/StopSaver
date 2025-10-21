@@ -20,8 +20,10 @@ bool StopSaverApp::init(HINSTANCE hInst) {
         _timer_interval = MAX_INTERVAL_MS;
     }
 
-    // Register window class with static thunk
-    static const wchar_t* kClass = L"StopSaverTrayApp";
+    _autoStartOnLaunch = _config->getAutoStartOnLaunch();
+    _restoreOnUnlock = _config->getRestoreOnUnlock();
+    _showUserAsActive = _config->getShowUserAsActive();
+
     _wcReg = std::make_unique<WindowClassRegistrar>(_hInst, kClass, &StopSaverApp::s_wndProc);
     if (!_wcReg->ok()) {
         _logger->error(L"Window Registration Failed");
@@ -40,7 +42,7 @@ bool StopSaverApp::init(HINSTANCE hInst) {
         return false;
     }
 
-    if (_config->getAutoStartOnLaunch()) {
+    if (_autoStartOnLaunch) {
         onStart();
     }
 
@@ -53,15 +55,12 @@ int StopSaverApp::run() {
         TranslateMessage(&msg);
         DispatchMessageW(&msg);
     }
-    // Timer and tray and session unregister via destructors
     return static_cast<int>(msg.wParam);
 }
 
 bool StopSaverApp::createMainWindow() {
     _logger->trace(L"StopSaverApp::createMainWindow()");
-    static const wchar_t* kClass = L"StopSaverTrayApp";
 
-    // Pass `this` through lpParam. Bind in WM_NCCREATE.
     _hWnd = CreateWindowExW(
         0, kClass, L"Stop Saver Tray App",
         WS_OVERLAPPEDWINDOW,
@@ -97,8 +96,9 @@ void StopSaverApp::setupContextMenu() {
     
     CheckMenuItem(menu, IDM_START, MF_BYCOMMAND | (_isStarted ? MF_CHECKED : MF_UNCHECKED));
     CheckMenuItem(menu, IDM_STOP, MF_BYCOMMAND | (!_isStarted ? MF_CHECKED : MF_UNCHECKED));
-    CheckMenuItem(menu, IDM_AUTO_START, MF_BYCOMMAND | (_config->getAutoStartOnLaunch() ? MF_CHECKED : MF_UNCHECKED));
-    CheckMenuItem(menu, IDM_RESTORE_ON_UNLOCK, MF_BYCOMMAND | (_config->getRestoreOnUnlock() ? MF_CHECKED : MF_UNCHECKED));
+    CheckMenuItem(menu, IDM_AUTO_START, MF_BYCOMMAND | (_autoStartOnLaunch ? MF_CHECKED : MF_UNCHECKED));
+    CheckMenuItem(menu, IDM_RESTORE_ON_UNLOCK, MF_BYCOMMAND | (_restoreOnUnlock ? MF_CHECKED : MF_UNCHECKED));
+    CheckMenuItem(menu, IDM_KEEP_ACTIVE, MF_BYCOMMAND | (_showUserAsActive ? MF_CHECKED : MF_UNCHECKED));
 
     POINT pt; GetCursorPos(&pt);
     SetForegroundWindow(_hWnd);
@@ -108,7 +108,8 @@ void StopSaverApp::setupContextMenu() {
 
 void StopSaverApp::onTimer() {
     _logger->trace(L"StopSaverApp::onTimer()");
-    sendMouseMove();
+    if( _showUserAsActive )
+        sendMouseMove();
 }
 
 void StopSaverApp::onStart() {
@@ -116,7 +117,7 @@ void StopSaverApp::onStart() {
     EXECUTION_STATE es = SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
     if (es == NULL) _logger->error(L"Failed to set execution state");
 
-    if (!_timer.start(_hWnd, 1, _timer_interval)) {
+    if (!_timer.start(_hWnd, IDT_MAIN_TIMER, _timer_interval)) {
         _logger->error(L"Failed to create timer");
         return;
     }
@@ -143,12 +144,20 @@ void StopSaverApp::onExit() {
 
 void StopSaverApp::onAutoStart() {
     _logger->trace(L"StopSaverApp::onAutoStart()");
-    _config->setAutoStartOnLaunch(!_config->getAutoStartOnLaunch());
+    _autoStartOnLaunch = !_autoStartOnLaunch;
+    _config->setAutoStartOnLaunch(_autoStartOnLaunch);
 }
 
 void StopSaverApp::onRestoreOnUnlock() {
     _logger->trace(L"StopSaverApp::onRestoreOnUnlock()");
-    _config->setRestoreOnUnlock(!_config->getRestoreOnUnlock());
+    _restoreOnUnlock = !_restoreOnUnlock;
+    _config->setRestoreOnUnlock(_restoreOnUnlock);
+}
+
+void StopSaverApp::onShowUserAsActive() {
+    _logger->trace(L"StopSaverApp::onShowUserAsActive()");
+    _showUserAsActive = !_showUserAsActive;
+    _config->setShowUserAsActive(_showUserAsActive);
 }
 
 void StopSaverApp::sendMouseMove() {
@@ -191,6 +200,9 @@ LRESULT StopSaverApp::wndProc(UINT message, WPARAM wParam, LPARAM lParam) {
         case IDM_RESTORE_ON_UNLOCK:
             onRestoreOnUnlock();
             break;
+        case IDM_KEEP_ACTIVE:
+            onShowUserAsActive();
+            break;
         case IDM_EXIT:  onExit(); break;
         }
         break;
@@ -211,7 +223,7 @@ LRESULT StopSaverApp::wndProc(UINT message, WPARAM wParam, LPARAM lParam) {
             break;
         case WTS_SESSION_UNLOCK: 
             _logger->debug(L"Session unlocked");
-            if (_config->getRestoreOnUnlock() && _stateOnLock)
+            if (_restoreOnUnlock && _stateOnLock)
             {
                 _logger->debug(L"Restoring state, to running");
                 onStart();
@@ -228,7 +240,7 @@ LRESULT StopSaverApp::wndProc(UINT message, WPARAM wParam, LPARAM lParam) {
         break;
 
     case WM_TIMER:
-        if (wParam == 1) onTimer();
+        if (wParam == IDT_MAIN_TIMER) onTimer();
         break;
 
     default:

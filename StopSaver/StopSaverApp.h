@@ -12,7 +12,7 @@
 class StopSaverApp 
 {
 public:
-    explicit StopSaverApp(std::shared_ptr<Config> config, std::shared_ptr<spdlog::logger> log) : _timer_interval(30000) , _config(std::move(config)), _logger(std::move(log)) {}
+    explicit StopSaverApp(std::shared_ptr<Config> config, std::shared_ptr<spdlog::logger> log) : _config(std::move(config)), _logger(std::move(log)) {}
 
     ~StopSaverApp() = default;
 
@@ -48,6 +48,7 @@ private:
     void onStop();
     void onAutoStart();
     void onRestoreOnUnlock();
+    void onShowUserAsActive();
     void onExit();
     void sendMouseMove();
 
@@ -56,15 +57,19 @@ private:
     LRESULT wndProc(UINT msg, WPARAM wParam, LPARAM lParam);
 
 private:
+    static constexpr wchar_t kClass[] = L"StopSaverTrayApp";
     HINSTANCE _hInst{ nullptr };
     HWND      _hWnd{ nullptr };
     bool      _isStarted{ false };
     bool      _stateOnLock{ false };
+    bool      _autoStartOnLaunch{ false };
+    bool      _restoreOnUnlock{ false };
+    bool      _showUserAsActive{ false };
+    UINT      _timer_interval{ 30000 };
 
     TrayIcon       _tray;
     Timer          _timer;
     SessionNotify  _session;
-    UINT _timer_interval;
 
     std::unique_ptr<WindowClassRegistrar> _wcReg;
     std::shared_ptr<spdlog::logger> _logger;

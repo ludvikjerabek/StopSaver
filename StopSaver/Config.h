@@ -25,6 +25,9 @@ public:
     bool getRestoreOnUnlock(bool def = false) const noexcept;
     void setRestoreOnUnlock(bool bRestore);
 
+    bool getShowUserAsActive(bool def = true) const noexcept;
+    void setShowUserAsActive(bool bShowActive);
+
     bool valueExists(const wchar_t* name) const noexcept;
     void deleteValue(const wchar_t* name);
 
