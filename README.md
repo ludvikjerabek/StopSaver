@@ -68,6 +68,15 @@ Under the `HKEY_CURRENT_USER\Software\StopSaver` registry
 * AutoStartOnLaunch - REG_DWORD value 0 or 1 are associated with the Tray Configuration Option `Start automatically on launch`
 * RestoreOnUnlock - REG_DWORD value 0 or 1 are associated with theTray Configuration Option `Restore active state on unlock`
 
+## How it works
+
+There are two mechanisms to prevent sleep:
+
+* `SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);` - Will prevent the system from sleeping, much like a Zoom session.
+* `SendInput(1, &input, sizeof(INPUT));` - The input type is `INPUT_MOUSE` and event type is `MOUSEEVENTF_MOVE` which tells the system the mouse moved.
+
+The `SendInput` call notifies other applications that the mouse is moving, preventing inactivity. 
+
 ## Performance
 
 Stop Saver is very low on resource consumption. 
