@@ -40,7 +40,7 @@ After launching Stop Saver, you will see a task tray icon as shown below.
 
 Click the icon and select the desired state.
 
-<img width="264" height="192" alt="image" src="https://github.com/user-attachments/assets/7276c0c8-41a4-4091-926d-c1a579b69de9" />
+<img width="268" height="211" alt="image" src="https://github.com/user-attachments/assets/fcdda1a3-d756-4b3c-9b6a-0e1c4152be80" />
 
 Once you select "Start," the icon will change as shown below.
 
@@ -52,10 +52,12 @@ If the user session is locked, Stop Saver will disable to prevent battery drain 
 
 ## Tray Configuration Options
 
-<img width="254" height="133" alt="image" src="https://github.com/user-attachments/assets/6209b9c0-80aa-436d-9c6d-56d9c4e57a83" />
+<img width="254" height="157" alt="image" src="https://github.com/user-attachments/assets/cd296418-e8ff-4372-8133-65fb3f2be8c2" />
   
 * Start automatically on launch - Once the applicaiton lanches, it will automatically be in the started state.
 * Restore active state on unlock - If you lock your system, walk away, and unlock. The prior running state will resume.
+* Show user as active - Send input type `INPUT_MOUSE` and event type `MOUSEEVENTF_MOVE` which telling the system the mouse moved.
+  * Note: This is what keeps other apps showing as active.
 
 ## User Registry Options (Manual Overrides)
 
@@ -68,8 +70,19 @@ Under the `HKEY_CURRENT_USER\Software\StopSaver` registry
 * AutoStartOnLaunch - REG_DWORD value 0 or 1 are associated with the Tray Configuration Option `Start automatically on launch`
 * RestoreOnUnlock - REG_DWORD value 0 or 1 are associated with theTray Configuration Option `Restore active state on unlock`
 
+## How it works
+
+There are two mechanisms to prevent sleep:
+
+* `SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);` - Will prevent the system from sleeping, much like a Zoom session.
+* `SendInput(1, &input, sizeof(INPUT));` - The input type is `INPUT_MOUSE` and event type is `MOUSEEVENTF_MOVE` which tells the system the mouse moved.
+
+The `SendInput` call notifies other applications that the mouse is moving, preventing inactivity. 
+
 ## Performance
 
-Stop Saver is very low on resource consumption.
+Stop Saver is very low on resource consumption. 
 
-![Performance](https://github.com/user-attachments/assets/13173b5e-dee3-4863-95da-4dcf1c9a439f)
+<img width="812" height="26" alt="image" src="https://github.com/user-attachments/assets/6bafb8f5-f1af-4ca8-b691-20338b14b05a" />  
+  
+Note: When the application starts task manager will show higher memory, but it falls after running for a while.   
