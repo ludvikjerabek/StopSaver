@@ -70,6 +70,8 @@ Under the `HKEY_CURRENT_USER\Software\StopSaver` registry
 
 ## Performance
 
-Stop Saver is very low on resource consumption.
+Stop Saver is very low on resource consumption. 
 
-![Performance](https://github.com/user-attachments/assets/13173b5e-dee3-4863-95da-4dcf1c9a439f)
+<img width="812" height="26" alt="image" src="https://github.com/user-attachments/assets/6bafb8f5-f1af-4ca8-b691-20338b14b05a" />  
+  
+Note: When the application starts task manager will show higher memory, but it falls after running for a while.   
