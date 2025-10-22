@@ -63,7 +63,7 @@ If the user session is locked, Stop Saver will disable to prevent battery drain 
 
 Under the `HKEY_CURRENT_USER\Software\StopSaver` registry
 
-* LogFile - REG_EXPAND_SZ value can be used to change the logfile path. Default is `%USERPOFILE%/stopsaver.log`
+* LogFile - REG_EXPAND_SZ value can be used to change the logfile path. Default is `%USERPROFILE%/stopsaver.log`
 * LogLevel - REG_SZ string values trace, debug, info, warn, error, critical, off. Default is `error`
 * MaxSizeLogSize - REG_DWORD value max size of logfile in bytes. Default is `10485760` 10MB
 * MouseIntervalMs - REG_DWORD value from 1000 to 60000 (in miliseconds). Default is `30000` (30s).
