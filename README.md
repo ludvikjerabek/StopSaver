@@ -56,7 +56,7 @@ If the user session is locked, Stop Saver will disable to prevent battery drain 
   
 * Start automatically on launch - Once the applicaiton lanches, it will automatically be in the started state.
 * Restore active state on unlock - If you lock your system, walk away, and unlock. The prior running state will resume.
-* Show user as active - Send input type `INPUT_MOUSE` and event type `MOUSEEVENTF_MOVE` which telling the system the mouse moved.
+* Show user as active - Send input type `INPUT_MOUSE` and event type `MOUSEEVENTF_MOVE` which tells the system the mouse moved.
   * Note: This is what keeps other apps showing as active.
 
 ## User Registry Options (Manual Overrides)
