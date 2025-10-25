@@ -1,12 +1,8 @@
 name: Visual Studio C++ Build (Static)
 
-# The `on` key specifies the events that trigger the workflow.
 on:
-  # This event is triggered when a new release is published.
   release:
     types: [published]
-
-  # This event adds a "Run workflow" button to the GitHub Actions UI.
   workflow_dispatch:
 
 jobs:
@@ -16,15 +12,22 @@ jobs:
     strategy:
       matrix:
         platform: [Win32, x64]
-      
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Add MSBuild to PATH
+      - name: Add MSBuild to PATH (x64)
+        if: matrix.platform == 'x64'
         uses: microsoft/setup-msbuild@v2
         with:
-          msbuild-architecture: ${{ matrix.platform == 'x64' && 'x64' || 'x86' }}
+          msbuild-architecture: x64
+
+      - name: Add MSBuild to PATH (Win32)
+        if: matrix.platform == 'Win32'
+        uses: microsoft/setup-msbuild@v2
+        with:
+          msbuild-architecture: x86
 
       - name: Build Solution
         run: msbuild StopSaver.sln /p:Configuration=Release /p:Platform=${{ matrix.platform }}
@@ -33,4 +36,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: built-application-${{ matrix.platform }}
-          path: YourProjectName\Release\StopSaver.exe
+          path: StopSaver\Release\StopSaver.exe
