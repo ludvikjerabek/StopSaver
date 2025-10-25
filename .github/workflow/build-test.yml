@@ -1,0 +1,33 @@
+name: Build Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    name: Build Test on ${{ matrix.platform }}
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        platform: [Win32, x64]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Add MSBuild to PATH (x64)
+        if: matrix.platform == 'x64'
+        uses: microsoft/setup-msbuild@v2
+        with:
+          msbuild-architecture: x64
+
+      - name: Add MSBuild to PATH (Win32)
+        if: matrix.platform == 'Win32'
+        uses: microsoft/setup-msbuild@v2
+        with:
+          msbuild-architecture: x86
+
+      - name: Build Solution
+        run: msbuild StopSaver.sln /p:Configuration=Release /p:Platform=${{ matrix.platform }}
