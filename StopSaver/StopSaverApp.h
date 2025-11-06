@@ -66,6 +66,7 @@ private:
     bool      _restoreOnUnlock{ false };
     bool      _showUserAsActive{ false };
     UINT      _timer_interval{ 30000 };
+    UINT      _taskbarCreated = 0;
 
     TrayIcon       _tray;
     Timer          _timer;

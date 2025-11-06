@@ -23,6 +23,7 @@ bool StopSaverApp::init(HINSTANCE hInst) {
     _autoStartOnLaunch = _config->getAutoStartOnLaunch();
     _restoreOnUnlock = _config->getRestoreOnUnlock();
     _showUserAsActive = _config->getShowUserAsActive();
+	_taskbarCreated = RegisterWindowMessageW(L"TaskbarCreated");
 
     _wcReg = std::make_unique<WindowClassRegistrar>(_hInst, kClass, &StopSaverApp::s_wndProc);
     if (!_wcReg->ok()) {
@@ -37,7 +38,7 @@ bool StopSaverApp::init(HINSTANCE hInst) {
         return false;
     }
 
-    if (!_tray.init(_hInst, _hWnd, IDI_ICON2, WM_APP + 1, L"Stop Saver (Inactive)")) {
+    if (!_tray.init(_hInst, _hWnd, IDI_ICON_ACTIVE, IDI_ICON_INACTIVE, WM_APP + 1 )) {
         _logger->error(L"Failed to add tray icon");
         return false;
     }
@@ -77,13 +78,7 @@ bool StopSaverApp::createMainWindow() {
 
 void StopSaverApp::updateTrayIcon() {
     _logger->trace(L"StopSaverApp::updateTrayIcon()");
-    _tray.setActiveState(
-        _hInst,
-        _isStarted,
-        IDI_ICON1, IDI_ICON2,
-        L"Stop Saver (Active)",
-        L"Stop Saver (Inactive)"
-    );
+    _tray.setActive(_isStarted);
 }
 
 void StopSaverApp::setupContextMenu() {
@@ -208,7 +203,7 @@ LRESULT StopSaverApp::wndProc(UINT message, WPARAM wParam, LPARAM lParam) {
         break;
 
     case WM_APP + 1:
-        if (lParam == WM_LBUTTONDOWN) {
+        if (lParam == WM_LBUTTONUP) {
             setupContextMenu();
         }
         break;
@@ -244,6 +239,12 @@ LRESULT StopSaverApp::wndProc(UINT message, WPARAM wParam, LPARAM lParam) {
         break;
 
     default:
+        if (_taskbarCreated && message == _taskbarCreated) {
+            _logger->error(L"Explorer restarted, re-adding tray icon");
+            _tray.reAdd();
+            updateTrayIcon();
+            return 0;
+        }
         return DefWindowProcW(_hWnd, message, wParam, lParam);
     }
     return 0;
