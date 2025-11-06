@@ -16,7 +16,7 @@ With Stop Saver, your computer stays active and responsive—no manual intervent
 
 ## Requirements
 
-* Windows x86 or x64
+* Windows 7 or greater (x86 or x64)
 
 ## Standalone Installation
 
