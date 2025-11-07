@@ -240,7 +240,7 @@ LRESULT StopSaverApp::wndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 
     default:
         if (_taskbarCreated && message == _taskbarCreated) {
-            _logger->error(L"Explorer restarted, re-adding tray icon");
+            _logger->info(L"Explorer restarted, re-adding tray icon");
             _tray.reAdd();
             updateTrayIcon();
             return 0;
