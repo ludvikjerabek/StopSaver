@@ -87,3 +87,12 @@ Stop Saver is very low on resource consumption.
 <img width="812" height="26" alt="image" src="https://github.com/user-attachments/assets/6bafb8f5-f1af-4ca8-b691-20338b14b05a" />  
   
 Note: When the application starts task manager will show higher memory, but it falls after running for a while.   
+
+### Feedback and Bugs
+
+Is anyone still running Windows XP or earlier versions of Windows where this tool might be useful?  
+If so, please reach out and let me know, it may be possible to make it compatible with older versions.
+
+If you discover any bugs or have suggestions for improvements, please feel free to share them.
+
+  
